@@ -1,4 +1,5 @@
 #!/bin/bash
+export LD_LIBRARY_PATH="/bin/chimera/.deps/gcc/relwithdebinfo/lib:$LD_LIBRARY_PATH"
 
 set -u
 
