@@ -4,32 +4,44 @@ set -e
 BASE_DIR="$( realpath -sm  "$( dirname "${BASH_SOURCE[0]}" )")"
 cd "$BASE_DIR"
 
-# Library path for GCC 13 and Conan deps
-LIB_PATH="$BASE_DIR/bin/chimera/.deps/gcc/relwithdebinfo/lib"
+source "$BASE_DIR/scripts/config.sh"
 
-for i in {1..8}; do
-  echo "---------------------------------------"
-  echo "Sending deployment to w$i"
+# Define a function to process an individual machine deployment
+deploy_to_node() {
+  local idx=$1
+  local node="w${idx}"
   
-  # Create directory structure
-  ssh w$i "mkdir -p \"$BASE_DIR\""
-  
-  # Transfer the deployment package
-  scp deployment.zip w$i:"$BASE_DIR/deployment.zip"
-  
-  # Extract, Setup, and handle the environment file
-  ssh w$i "cd \"$BASE_DIR\"; \
-           # 1. Clean out the old conflicting dir if it exists
-           rm -rf bin/chimera; \
-           unzip -o deployment.zip; \
-           tar -xf ycsb-0.12.0.tar.gz; \
-           rm -rf YCSB; mv ycsb-0.12.0 YCSB; \
-           # 2. Extract binaries
-           cd bin; unzip -o -q bin.zip; \
-           # 3. Create a symlink so scripts looking for 'bin/chimera' find the binary
-           ln -sf chimera-bin chimera-exe; \
-           echo 'Deployment extraction complete on w$i'"
+  # Redirect internal output to a local node log or silence to prevent terminal text corruption
+  (
+    ssh "$node" "mkdir -p \"$BASE_DIR\""
+    scp -C -o Cipher=chacha20-poly1305@openssh.com deployment.zip "${node}:$BASE_DIR/deployment.zip"
+    
+    ssh "$node" "unzip -o \"$BASE_DIR/deployment.zip\" -d \"$BASE_DIR\"; \
+                 cd \"$BASE_DIR\"; \
+                 tar -xf ycsb-0.12.0.tar.gz; \
+                 rm -rf YCSB; mv ycsb-0.12.0 YCSB; \
+                 cd \"$BASE_DIR/bin\"; \
+                 mkdir -p staging; \
+                 unzip -o -q bin.zip -d staging/; \
+                 mv -f staging/chimera ./chimera-exe; \
+                 mv -f staging/* ./ 2>/dev/null || true; \
+                 rm -rf staging;"
+                 
+    echo " ✓ [${node}] Deployment payload successfully processed and verified."
+  ) 2>&1 | sed "s/^/[${node}] /" # Prefixes the output lines so you know which node is talking
+}
+
+echo "Starting parallel broadcast deployment to ${MACHINE_COUNT} nodes..."
+echo "------------------------------------------------------------"
+
+# Fire off the worker functions into the background simultaneously
+for i in $(seq 1 "$MACHINE_COUNT"); do
+  deploy_to_node "$i" &
 done
 
-echo "---------------------------------------"
-echo "Deployment successful to all nodes."
+# CRITICAL barrier: Instructs the parent script to pause here until 
+# EVERY background child process has finished executing
+wait
+
+echo "------------------------------------------------------------"
+echo "Parallel deployment successful across all nodes!"

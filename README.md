@@ -254,3 +254,10 @@ plot-datapoints/fig13-metadata-buffers.py # plot as pdf in output-plots/
 # Navigating the code
 
 How to navigate the code is described in the [README of the swarm-kv repository](https://github.com/LPD-EPFL/swarm-kv?tab=readme-ov-file#navigating-the-code).
+
+
+# Troubleshooting
+If you see errors like:
+.can't find window: server1
+
+Run ./scripts/kill-all-tmux.sh

@@ -22,8 +22,11 @@ for retry in $(seq 1 15); do
 
   echo -n "Starting"
 
+  # Trigger our newly fixed, aggressive port-cleaning script
   "$SCRIPT_DIR"/remote-memc.sh $REGISTRY_MACHINE
-  sleep 0.1
+  
+  # CRITICAL: Allow time for the tmux window to initialize and bind port 11211
+  sleep 1.5
 
   for s in $(seq 1 $NBSERVERS); do
     echo -n "."
@@ -31,6 +34,9 @@ for retry in $(seq 1 15); do
     CORE=$(((($s - 1) / $SERVER_MACHINES) * 2))
     "$SCRIPT_DIR"/remote-invoker.sh $MACHINE "$FOLDER" server$s $CORE "$BIN_DIR/$BINARY" -i $s $ARGS
   done
+
+  echo -n " (Waiting for servers to initialize)..."
+  sleep 1.5
 
   for c in $(seq 1 $NBCLIENTS); do
     echo -n "."

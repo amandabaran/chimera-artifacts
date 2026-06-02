@@ -11,19 +11,25 @@ FIRST_MACHINE=1
 FIRST_SERVER=$FIRST_MACHINE
 SERVER_MACHINES=4
 FIRST_CLIENT=$(($FIRST_MACHINE + $SERVER_MACHINES))
-CLIENT_MACHINES=4
+CLIENT_MACHINES=8
 MACHINE_COUNT=$(($SERVER_MACHINES + $CLIENT_MACHINES))
 REGISTRY_MACHINE=machine1
 
 # Set ssh names of the machines
-machine1=w7
-machine2=w8
-machine3=w6
-machine4=w5
-machine5=w1
-machine6=w2
-machine7=w3
-machine8=w4
+#Server Machines
+machine1=w1
+machine2=w2
+machine3=w3
+machine4=w4
+# Client Machines
+machine5=w5
+machine6=w6
+machine7=w7
+machine8=w8
+machine9=w9
+machine10=w10
+machine11=w11
+machine12=w12
 
 # Set fqdn names of the machines (use `hostname -f`)
 machine1hostname=swarm-${machine1}
@@ -34,6 +40,10 @@ machine5hostname=swarm-${machine5}
 machine6hostname=swarm-${machine6}
 machine7hostname=swarm-${machine7}
 machine8hostname=swarm-${machine8}
+machine9hostname=swarm-${machine9}
+machine10hostname=swarm-${machine10}
+machine11hostname=swarm-${machine11}
+machine12hostname=swarm-${machine12}
 
 
 # Memcached does not run with root access

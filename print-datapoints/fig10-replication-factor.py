@@ -25,13 +25,18 @@ for s in ['SWARM-KV','DM-ABD']:
                 f'fig10-replication-factor/{workload}/{s}/{replicas}replicas/client{c}.txt',
             )
             data = parse(path)
-            getavg += data['GET']['psum'] / (4 * data['GET']['pcount'])
-            get99 += data['GET'][99] / 4
-            get1 += data['GET'][1] / 4
-            updavg += data['UPDATE']['psum'] / (4 * data['UPDATE']['pcount'])
-            upd99 += data['UPDATE'][99] / 4
-            upd1 += data['UPDATE'][1] / 4
-            tputavg += data['local tput'] / 4
+            
+            # Safe Guard: Ensure the keys actually parsed successfully before doing math
+            if data and 'GET' in data and 'UPDATE' in data and 'local tput' in data:
+                getavg += data['GET']['psum'] / (4 * data['GET']['pcount'])
+                get99 += data['GET'][99] / 4
+                get1 += data['GET'][1] / 4
+                updavg += data['UPDATE']['psum'] / (4 * data['UPDATE']['pcount'])
+                upd99 += data['UPDATE'][99] / 4
+                upd1 += data['UPDATE'][1] / 4
+                tputavg += data['local tput'] / 4
+            else:
+                print(f"Warning: {path} was empty or could not be parsed successfully.")
         
         # opavg = ((getavg + updavg) / 2) if workload == "workload-A" else (getavg * 0.95 + updavg * 0.05)
         print(f'  - {replicas} replicas:')
