@@ -23,14 +23,14 @@ def parse(path):
     with open(path) as f:
         measurement = ""
         for line in f:
-            l = line.lower()
+            l = line.lower().strip()
             if l[:-1] == '################ batch stats:':
                 break
             elif l[:-1] == '################ main stats:':
                 break
         if l[:-1] == '################ batch stats:':
             for line in f:
-                l = line.lower()
+                l = line.lower().strip()
                 if l[:-1] == '################ main stats:':
                     break
                 elif l[:-1] in batch_measurements:
@@ -55,7 +55,7 @@ def parse(path):
                             out[measurement].append(value)
         measurement = ""        
         for line in f:
-            l = line.lower()
+            l = line.lower().strip()
             if l[:-1] in measurements:
                 measurement = measurements[l[:-1]]
                 assert(measurement not in out)

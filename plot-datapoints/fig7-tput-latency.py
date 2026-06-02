@@ -36,6 +36,15 @@ schemes = {
         'marker': 's',
         'mew': .0,
     },
+    'CHIMERA': {
+        'label': 'CHIMERA',
+        'color': "#0bab0b",
+        'lstyle': '*--',
+        'lwidth': 1.4,
+        'markersize': 3.5,
+        'marker': 'o',
+        'mew': 0.8,
+    },
 }
 
 legends = [

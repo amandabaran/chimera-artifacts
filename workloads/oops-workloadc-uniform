@@ -1,0 +1,19 @@
+# Custom YCSB Workload C (Read-Only)
+# Matches the data constraints of oops-workloada (1 field, 63 bytes)
+
+fieldcount=1
+fieldlength=63
+
+recordcount=100000
+operationcount=1000000
+workload=com.yahoo.ycsb.workloads.CoreWorkload
+
+readallfields=true
+
+readproportion=1.0
+updateproportion=0
+scanproportion=0
+insertproportion=0
+
+# Changed to uniform distribution to bypass the pointer/LRU cache benefits
+requestdistribution=uniform

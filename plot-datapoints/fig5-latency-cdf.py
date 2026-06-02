@@ -32,6 +32,12 @@ for workload in ["B"]:
             'lstyle': ':',
             'lwidth': 1.4,
         },
+        'CHIMERA': {
+            'label': 'CHIMERA',
+            'color': "#0bab0b",
+            'lstyle': '*--',
+            'lwidth': 1.4,
+        },
     }
 
     ops = {
