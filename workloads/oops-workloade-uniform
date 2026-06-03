@@ -17,8 +17,8 @@ scanproportion=0.95
 insertproportion=0
 
 # Scan configuration parameters
-maxscanlength=10
+maxscanlength=8
 scanlengthdistribution=uniform
 
 # Access pattern across keyspace
-requestdistribution=zipfian
+requestdistribution=uniform

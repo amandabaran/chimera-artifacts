@@ -38,7 +38,7 @@ def parse_chimera_native(path):
 
 # --- Configuration ---
 SERVERS_CONFIG = '3servers'
-MAX_CLIENTS = 8  # Set to 16, 32, or 64 as you extend your performance tests
+MAX_CLIENTS = 64  # Set to 16, 32, or 64 as you extend your performance tests
 
 apps = {
     'YCSB A - Uniform' : 'A',
@@ -52,6 +52,12 @@ schemes = {
     },
     'CHIMERA': {
         'label': 'CHIMERA', 'color': '#0bab0b', 'lstyle': '--', 'lwidth': 1.2,
+    },
+    'DM-ABD': {
+            'label': 'DM-ABD', 'color': '#d11414', 'lstyle': '--', 'lwidth': 1,
+    },
+    'FUSEE': {
+            'label': 'FUSEE', 'color': '#f4860b', 'lstyle': ':', 'lwidth': 1.4,
     },
 }
 

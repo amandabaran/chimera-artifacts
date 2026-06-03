@@ -21,4 +21,4 @@ maxscanlength=500
 scanlengthdistribution=uniform
 
 # Access pattern across keyspace
-requestdistribution=zipfian
+requestdistribution=uniform
