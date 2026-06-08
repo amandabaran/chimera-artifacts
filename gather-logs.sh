@@ -8,8 +8,23 @@ cd "$BASE_DIR"
 source "$BASE_DIR/scripts/config.sh"
 
 for i in $(seq 1 "$MACHINE_COUNT"); do
-  ssh w$i "cd \"$BASE_DIR\"; rm -rf logs.zip; zip -r logs.zip logs/"
-  scp w$i:"$BASE_DIR/logs.zip" w$i-logs.zip
-  unzip -o w$i-logs.zip
-  rm -rf w$i-logs.zip
+ (
+    echo "[Machine w$i] Starting log collection..."
+    
+    # 1. SSH and zip remotely
+    ssh w$i "cd \"$BASE_DIR\"; rm -rf logs.zip; zip -r logs.zip logs/"
+    
+    # 2. SCP the zip file back
+    scp w$i:"$BASE_DIR/logs.zip" w$i-logs.zip
+    
+    # 3. Unzip locally and clean up the zip archive
+    unzip -o w$i-logs.zip
+    rm -rf w$i-logs.zip
+    
+    echo "[Machine w$i] Finished!"
+  ) &
 done
+
+wait
+
+echo "All log collections complete!"
