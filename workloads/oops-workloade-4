@@ -17,7 +17,7 @@ scanproportion=0.95
 insertproportion=0
 
 # Scan configuration parameters
-maxscanlength=100
+maxscanlength=4
 scanlengthdistribution=uniform
 
 # Access pattern across keyspace

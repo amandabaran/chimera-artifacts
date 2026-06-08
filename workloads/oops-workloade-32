@@ -1,0 +1,24 @@
+# Custom YCSB Workload E (Short Scans)
+# Matches the data constraints of oops-workloada (1 field, 63 bytes)
+
+fieldcount=1
+fieldlength=63
+
+recordcount=100000
+operationcount=1000000
+workload=com.yahoo.ycsb.workloads.CoreWorkload
+
+readallfields=true
+
+# Workload E Standard Proportions (95% Scans, 5% Updates/Inserts)
+readproportion=0
+updateproportion=0.05
+scanproportion=0.95
+insertproportion=0
+
+# Scan configuration parameters
+maxscanlength=32
+scanlengthdistribution=uniform
+
+# Access pattern across keyspace
+requestdistribution=uniform
