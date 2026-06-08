@@ -7,6 +7,7 @@ from prelude import plt
 from matplotlib.ticker import *
 from matplotlib.lines import Line2D
 
+# --- Unified Log Parser Function ---
 def parse_chimera_native(path):
     out = {}
     current_op = None
@@ -42,12 +43,13 @@ def parse_chimera_native(path):
                         out[current_op]['psum'] += latency_us
     return out
 
+# --- Configuration & Styling Specs ---
 AGGREGATE_METRICS = True 
 SERVERS_CONFIG = '3servers'
 
 apps = [
-    {'title': 'YCSB A - 50/50', 'letter': 'A', 'lat_max': 60, 'lat_step': 10, 'tput_max': 6.0,  'tput_step': 2.0},
-    {'title': 'YCSB B - 95/5',  'letter': 'B', 'lat_max': 40, 'lat_step': 6,  'tput_max': 15.0, 'tput_step': 5.0},
+    {'title': 'YCSB A - 50/50', 'letter': 'A', 'lat_max': 60, 'lat_step': 10, 'tput_max': 4.0,  'tput_step': 1.0},
+    {'title': 'YCSB B - 95/5',  'letter': 'B', 'lat_max': 24, 'lat_step': 6,  'tput_max': 15.0, 'tput_step': 5.0},
     {'title': 'YCSB C - 100/0', 'letter': 'C', 'lat_max': 15, 'lat_step': 5,  'tput_max': 18.0, 'tput_step': 6.0}
 ]
 
@@ -66,17 +68,18 @@ legends_schemes = [
            linewidth=schemes[s]['lwidth'], label=schemes[s]['label']) for s in schemes
 ]
 
-# --- EXPANDED 2 ROW x 3 COLUMN LAYOUT ---
-# Widened figure size (5.2 inches wide) offers much larger individual axes panels
-fig, axes = plt.subplots(2, 3, figsize=(5.20, 2.50))
-fig.subplots_adjust(top=0.84, bottom=0.15, left=0.09, right=0.98, hspace=0.45, wspace=0.32)
+# --- UNIFIED GRID GEOMETRY (Fixed spacing and breathing room) ---
+fig, axes = plt.subplots(3, 2, figsize=(3.70, 4.25))
+# Adjusted top to 0.89 to prevent title collision with legend; adjusted bottom to 0.10 to save X-axis text
+fig.subplots_adjust(top=0.89, bottom=0.10, left=0.13, right=0.96, hspace=0.42, wspace=0.38)
 
 # --- Processing & Plotting Loop ---
-for col_idx, app in enumerate(apps):
-    lat_axis = axes[0, col_idx]  # Row 1: Latency
-    tput_axis = axes[1, col_idx] # Row 2: Throughput
+for row_idx, app in enumerate(apps):
+    lat_axis = axes[row_idx, 0]  # Column 1: Latency
+    tput_axis = axes[row_idx, 1] # Column 2: Throughput
     
-    lat_axis.set_title(app['title'], pad=5, fontsize=8.5)
+    lat_axis.set_title(f"{app['title']} (Latency)", pad=4, fontsize=8.0)
+    tput_axis.set_title(f"{app['title']} (Tput)", pad=4, fontsize=8.0)
     
     for s in schemes:
         valid_clients = []
@@ -131,22 +134,22 @@ for col_idx, app in enumerate(apps):
                 tput_axis.plot(valid_clients, tput_points, color=schemes[s]['color'], 
                                linestyle=schemes[s]['lstyle'], linewidth=schemes[s]['lwidth'])
 
-    # --- Boundaries and Local Labels ---
+    # --- Row Boundaries and Specific Axis Tuning ---
     lat_axis.set_ylim(0, app['lat_max'])
     lat_axis.yaxis.set_major_locator(MultipleLocator(app['lat_step']))
     
     tput_axis.set_ylim(0, app['tput_max'])
     tput_axis.yaxis.set_major_locator(MultipleLocator(app['tput_step']))
     
-    # Label left column only to save horizontal whitespace
-    if col_idx == 0:
-        lat_axis.set_ylabel('Latency (μs)', labelpad=3, fontsize=8.0)
-        tput_axis.set_ylabel('Tput (Mops)', labelpad=3, fontsize=8.0)
-        
-    # X-labels only go on the bottom row
-    tput_axis.set_xlabel('Clients', labelpad=2, fontsize=8.0)
+    lat_axis.set_ylabel('Latency (μs)', labelpad=2, fontsize=7.5)
+    tput_axis.set_ylabel('Tput (Mops)', labelpad=2, fontsize=7.5)
+    
+    # Apply X-labels explicitly to the bottom row
+    if row_idx == 2:
+        lat_axis.set_xlabel('Clients', labelpad=2, fontsize=7.5)
+        tput_axis.set_xlabel('Clients', labelpad=2, fontsize=7.5)
 
-# --- Formatting Clean Pass ---
+# --- Grid & Labels Cleanup Pass ---
 for row_idx, row in enumerate(axes):
     for subplot in row:
         subplot.tick_params(axis='both', which='major', pad=2.0, labelsize=7.5)
@@ -156,17 +159,21 @@ for row_idx, row in enumerate(axes):
         subplot.set_xlim(0, MAX_CLIENTS + 4)
         subplot.xaxis.set_major_locator(MultipleLocator(16))
         
-        if row_idx == 0:
+        # FIX: Ensure label visibility behaves cleanly on shared-looking grids
+        if row_idx < 2:
             subplot.tick_params(labelbottom=False)
+        else:
+            subplot.tick_params(labelbottom=True)
             
         subplot.grid(True, which='major', axis='both', linestyle='--', linewidth=0.5, alpha=0.7)
         subplot.set_axisbelow(True)
 
-# --- Overhead Centered Legend ---
-leg_scheme = fig.legend(handles=legends_schemes, bbox_to_anchor=(0.54, 0.94), 
+# --- Fixed Global Shared Legend Box (Repositioned to fully eliminate frame cutoff) ---
+leg_scheme = fig.legend(handles=legends_schemes, bbox_to_anchor=(0.54, 0.95), 
                         loc='center', edgecolor='black', ncols=4, 
-                        borderpad=.20, handletextpad=0.5, fontsize=8.0)
+                        borderpad=.20, handletextpad=0.5, fontsize=7.5)
 
+# --- Save Unified Matrix ---
 os.makedirs("output-plots", exist_ok=True)
-plt.savefig("output-plots/ycsb-unified-matrix-2x3.pdf", format='pdf', bbox_inches='tight', pad_inches=0.01)
-print("Saved legible 2x3 matrix format.")
+plt.savefig("output-plots/ycsb-unified-matrix.pdf", format='pdf', bbox_inches='tight', pad_inches=0.01)
+print("Saved matrix layout with fixed spacing successfully.")
